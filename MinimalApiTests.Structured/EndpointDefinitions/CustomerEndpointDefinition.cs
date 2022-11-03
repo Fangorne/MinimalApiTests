@@ -1,4 +1,5 @@
-﻿using MinimalApiTests.Structured.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using MinimalApiTests.Structured.Models;
 using MinimalApiTests.Structured.Services;
 
 namespace MinimalApiTests.Structured.EndpointDefinitions;
@@ -7,11 +8,19 @@ public class CustomerEndpointDefinition : IEndpointDefinition
 {
     public void DefineEndpoints(WebApplication app)
     {
-        app.MapGet("/customers", GetAllCustomers);
-        app.MapGet("/customers/{id}", GetCustomerById);
-        app.MapPost("/customers", CreateCustomer);
-        app.MapPut("/customers/{id}", UpdateCustomer);
-        app.MapDelete("/customers/{id}", DeleteCustomerById);
+        app.MapGet("/customersWithAuthorization", GetAllCustomersWithAuthorization);
+
+        app.MapGet("/customers", GetAllCustomers).AllowAnonymous();
+        app.MapGet("/customers/{id}", GetCustomerById).AllowAnonymous();
+        app.MapPost("/customers", CreateCustomer).AllowAnonymous();
+        app.MapPut("/customers/{id}", UpdateCustomer).AllowAnonymous();
+        app.MapDelete("/customers/{id}", DeleteCustomerById).AllowAnonymous();
+    }
+
+    [ProducesResponseType(200, Type= typeof(Customer))]
+    internal List<Customer> GetAllCustomersWithAuthorization(ICustomerService service)
+    {
+        return service.GetAll();
     }
 
     internal List<Customer> GetAllCustomers(ICustomerService service)
